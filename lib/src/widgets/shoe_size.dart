@@ -104,14 +104,15 @@ class _TallaShoeBox extends StatelessWidget {
       width: 45,
       height: 45,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: (number == 9 ) ? const Color(0xffF1A23A) :Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: const [
-          //BoxShadow()
+        boxShadow: [
+          if( number == 9.0)
+            const BoxShadow( color: Color(0xffF1A23A), blurRadius: 10, offset: Offset(0, 5) )
         ]
       ),
-      child: Text('$number', style: const TextStyle( 
-          color: Color(0xffF1A23A),
+      child: Text('$number', style: TextStyle( 
+          color: ( number == 9 ) ?  Colors.white : const Color(0xffF1A23A),
           fontWeight: FontWeight.bold
         ) 
       ),

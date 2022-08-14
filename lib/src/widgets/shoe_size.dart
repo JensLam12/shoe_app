@@ -1,24 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shoes_app/src/models/shoe_model.dart';
+import 'package:shoes_app/src/screens/screens.dart';
 
 class ShoePreview extends StatelessWidget {
-  const ShoePreview({Key? key}) : super(key: key);
+  final bool fullScreen;
+
+  const ShoePreview({
+    Key? key, 
+    required this.fullScreen
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
-      child: Container(
-        width: double.infinity,
-        height: 430,
-        decoration: BoxDecoration(
-          color: const Color(0xffFFCF53),
-          borderRadius: BorderRadius.circular(50)
+    return GestureDetector(
+      onTap: () {
+        if( !fullScreen ) {
+          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const ShoeDescriptionScreen() ) );
+        }
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: ( fullScreen) ? 5 : 30, 
+          vertical: ( fullScreen) ? 0 : 5
         ),
-        child: Column(
-          children: const [
-            _ShoeWithShadow(),
-            _ShoeTallas()
-          ],
+        child: Container(
+          width: double.infinity,
+          height: (!fullScreen) ? 430 : 390,
+          decoration: BoxDecoration(
+            color: const Color(0xffFFCF53),
+            borderRadius: ( !fullScreen) 
+              ? BorderRadius.circular(50)
+              : const BorderRadius.only( bottomLeft: Radius.circular( 50 ), bottomRight: Radius.circular( 50 ), topLeft: Radius.circular( 40), topRight: Radius.circular( 40) )
+          ),
+          child: Column(
+            children: [
+              const _ShoeWithShadow(),
+              if( !fullScreen )
+               const _ShoeTallas()
+            ],
+          ),
         ),
       ),
     );
@@ -30,16 +51,18 @@ class _ShoeWithShadow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shoeModel = Provider.of<ShoeModel>(context);
+    
     return Padding(
       padding: const EdgeInsets.all(50),
       child: Stack(
-        children: const [
-          Positioned(
+        children: [
+          const Positioned(
             bottom: 20,
             right: 0,
             child: _ShoeShadow()
           ),
-          Image(image: AssetImage('assets/imgs/azul.png') )
+          Image(image: AssetImage( shoeModel.assetImage) )
         ],
       ),
     );
@@ -99,22 +122,31 @@ class _TallaShoeBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      width: 45,
-      height: 45,
-      decoration: BoxDecoration(
-        color: (number == 9 ) ? const Color(0xffF1A23A) :Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          if( number == 9.0)
-            const BoxShadow( color: Color(0xffF1A23A), blurRadius: 10, offset: Offset(0, 5) )
-        ]
-      ),
-      child: Text('$number', style: TextStyle( 
-          color: ( number == 9 ) ?  Colors.white : const Color(0xffF1A23A),
-          fontWeight: FontWeight.bold
-        ) 
+
+    final shoeModel = Provider.of<ShoeModel>(context);
+
+    return GestureDetector(
+      onTap: () {
+        final shoeModel = Provider.of<ShoeModel>(context, listen: false);
+        shoeModel.talla = number;
+      },
+      child: Container(
+        alignment: Alignment.center,
+        width: 45,
+        height: 45,
+        decoration: BoxDecoration(
+          color: (number == shoeModel.talla ) ? const Color(0xffF1A23A) :Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            if( number == shoeModel.talla)
+              const BoxShadow( color: Color(0xffF1A23A), blurRadius: 10, offset: Offset(0, 5) )
+          ]
+        ),
+        child: Text('$number', style: TextStyle( 
+            color: ( number == shoeModel.talla ) ?  Colors.white : const Color(0xffF1A23A),
+            fontWeight: FontWeight.bold
+          ) 
+        ),
       ),
     );
   }
